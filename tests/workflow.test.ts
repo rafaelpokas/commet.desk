@@ -27,10 +27,10 @@ test('Piloto VSD: isolamento, arquivos e aprovação', async t => {
   const pdf = Buffer.from('%PDF-1.4\n% test fixture\n%%EOF').toString('base64');
   let a: any;
   try {
-    await t.test('seed contém apenas VSD, 3 propostas e nenhuma aprovação fictícia',()=>{
+    await t.test('seed contém VSD, 3 propostas, 6 pedidos e nenhuma aprovação fictícia',()=>{
       assert.deepEqual(db.getClients().map(c=>c.id),['cli_vsd']);
-      assert.equal(db.getDeliveries().length,3);
-      assert.deepEqual(db.getDeliveries().map(d=>d.scheduledPublicationDate?.slice(0,10)),['2026-10-16','2026-10-23','2026-10-30']);
+      assert.equal(db.getDeliveries().length,9);
+      assert.deepEqual(db.getDeliveries().slice(0,3).map(d=>d.scheduledPublicationDate?.slice(0,10)),['2026-10-16','2026-10-23','2026-10-30']);
       assert.ok(db.getDeliveries().every(d=>d.approvalStatus==='nao_solicitado' && !d.isScheduledConfirmed));
     });
     await t.test('upload valida formato e não permite cliente gravar',async()=>{
@@ -96,7 +96,7 @@ test('Piloto VSD: isolamento, arquivos e aprovação', async t => {
     await t.test('reset está bloqueado e plano do mês não duplica propostas',async()=>{
       assert.equal((await call('/api/auth/reset-db','POST')).status,403);
       await call('/api/plans/generate','POST',{clientId:'cli_vsd',competenceMonth:'2026-10'});
-      assert.equal(db.getDeliveries().length,3);
+      assert.equal(db.getDeliveries().length,9);
     });
     await t.test('tarefas têm apenas um responsável concorrente e cliente desativado perde acesso',async()=>{
       const id=db.getTasks()[0].id;
@@ -107,3 +107,4 @@ test('Piloto VSD: isolamento, arquivos e aprovação', async t => {
     });
   } finally { await new Promise<void>(r=>server.close(()=>r())); fs.rmSync(dir,{recursive:true,force:true}); }
 });
+
