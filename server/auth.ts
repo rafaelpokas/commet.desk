@@ -26,7 +26,7 @@ export function getUserFromRequest(req: Request): User | null {
   }
 
   // Deactivated user check (RF03, AC14)
-  if (user.status !== 'active') {
+  if ((user.clientId && db.getClients().find(c => c.id === user.clientId)?.status !== 'active') || user.status !== 'active') {
     return null;
   }
 

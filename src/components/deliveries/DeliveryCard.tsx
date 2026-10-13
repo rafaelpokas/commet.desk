@@ -1,3 +1,4 @@
+import { ClientName, useClientName } from '../../contexts/ClientsContext';
 import React, { useState } from 'react';
 import { Delivery, ProductionStatus } from '../../types';
 import { ProductionStatusBadge, ApprovalStatusBadge, ChannelIcon } from '../common/StatusBadge';
@@ -20,7 +21,7 @@ export const DeliveryCard: React.FC<DeliveryCardProps> = ({
   const { isStaff } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const clientName = delivery.clientId === 'cli_solartech' ? 'SolarTech' : 'Nexa Log';
+  const clientName = useClientName(delivery.clientId);
 
   const formatDate = (dateStr?: string) => {
     if (!dateStr) return 'Sem data';

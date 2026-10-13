@@ -24,7 +24,7 @@ function hasContentChanged(
   channel: Channel,
   scheduledPublicationDate?: string
 ): boolean {
-  if (!current) return false;
+  if (!current) return true;
   if (current.title !== title) return true;
   if (current.copywriting !== copywriting) return true;
   if (current.channel !== channel) return true;
@@ -119,6 +119,10 @@ router.post('/', requireAuth, requireStaff, (req: AuthenticatedRequest, res: Res
     });
   }
 
+  const client = db.getClients().find(c => c.id === clientId && c.status === 'active');
+  if (!client || !client.channels.includes(channel)) return res.status(400).json({ error: 'Cliente ou canal inválido.' });
+  if (designatedApproverId && !db.getUsers().some(u => u.id === designatedApproverId && u.clientId === clientId && u.role === 'client_approver' && u.status === 'active')) return res.status(400).json({ error: 'Aprovador inválido para este cliente.' });
+
   // RF06, AC03: Look up default assignee if not explicitly provided
   let assigneeId = primaryAssigneeId;
   let assigneeName = '';
@@ -176,7 +180,7 @@ router.post('/', requireAuth, requireStaff, (req: AuthenticatedRequest, res: Res
     currentVersionNumber: 1,
     versions: [initialVersion],
     approvalStatus: 'nao_solicitado',
-    designatedApproverId: designatedApproverId || undefined,
+    designatedApproverId: designatedApproverId || db.getUsers().find(u => u.clientId === clientId && u.role === 'client_approver' && u.status === 'active')?.id,
     isScheduledConfirmed: false,
     createdAt: now,
     updatedAt: now
@@ -215,6 +219,9 @@ router.put('/:id', requireAuth, requireStaff, (req: AuthenticatedRequest, res: R
     return res.status(404).json({ error: 'Entrega não encontrada' });
   }
 
+  if (req.body.expectedUpdatedAt && req.body.expectedUpdatedAt !== delivery.updatedAt) return res.status(409).json({ error: 'A entrega foi alterada. Recarregue antes de salvar.' });
+  if (delivery.productionStatus === 'publicado') return res.status(409).json({ error: 'Entrega publicada preserva o histórico. Crie uma nova entrega para republicar.' });
+
   const {
     title,
     briefing,
@@ -236,7 +243,7 @@ router.put('/:id', requireAuth, requireStaff, (req: AuthenticatedRequest, res: R
   const currentVersion = delivery.versions.find(v => v.versionNumber === delivery.currentVersionNumber);
 
   // Check if core content has changed (RF10, AC07)
-  const contentChanged = hasContentChanged(
+  const contentChanged = (briefing !== undefined && briefing !== delivery.briefing) || hasContentChanged(
     currentVersion,
     title ?? delivery.title,
     copywriting ?? delivery.copywriting,
@@ -249,7 +256,7 @@ router.put('/:id', requireAuth, requireStaff, (req: AuthenticatedRequest, res: R
   let oldApprovalStatus = delivery.approvalStatus;
 
   // If content changed and delivery had an approved version or was submitted for approval (RF10, AC07)
-  if (contentChanged && (delivery.approvalStatus === 'aprovado' || delivery.approvalStatus === 'aguardando_aprovacao')) {
+  if (contentChanged && (currentVersion?.decision || delivery.approvalStatus !== 'nao_solicitado')) {
     const nextVersionNum = delivery.currentVersionNumber + 1;
     const newVersion: DeliveryVersion = {
       versionNumber: nextVersionNum,
@@ -267,7 +274,9 @@ router.put('/:id', requireAuth, requireStaff, (req: AuthenticatedRequest, res: R
 
     delivery.versions.push(newVersion);
     delivery.currentVersionNumber = nextVersionNum;
-    delivery.approvalStatus = 'aguardando_aprovacao'; // Reset to require new approval (AC07)
+    delivery.approvalStatus = 'nao_solicitado';
+    delivery.productionStatus = 'em_producao';
+    delivery.isScheduledConfirmed = false;
     newVersionCreated = true;
 
     // Audit log
@@ -315,6 +324,11 @@ router.put('/:id', requireAuth, requireStaff, (req: AuthenticatedRequest, res: R
     }
   }
 
+  if (contentChanged && !newVersionCreated) {
+    const snapshot: DeliveryVersion = { versionNumber: delivery.currentVersionNumber, title: delivery.title, briefing: delivery.briefing, copywriting: delivery.copywriting, mediaUrls: [...delivery.mediaUrls], channel: delivery.channel, scheduledPublicationDate: delivery.scheduledPublicationDate, createdAt: now, createdByUserId: req.user!.id, createdByName: req.user!.name };
+    const idx = delivery.versions.findIndex(v => v.versionNumber === delivery.currentVersionNumber);
+    if (idx < 0) delivery.versions.push(snapshot); else delivery.versions[idx] = snapshot;
+  }
   delivery.updatedAt = now;
   db.save();
 
@@ -335,6 +349,10 @@ router.post('/:id/send-approval', requireAuth, requireStaff, (req: Authenticated
   if (!delivery) {
     return res.status(404).json({ error: 'Entrega não encontrada' });
   }
+
+  if (delivery.approvalStatus === 'aguardando_aprovacao') return res.json({ delivery, message: 'Esta versão já está aguardando aprovação.' });
+  if (delivery.approvalStatus === 'aprovado' || delivery.productionStatus === 'publicado') return res.status(409).json({ error: 'Esta versão já foi aprovada.' });
+  if (['reprovado', 'ajustes_solicitados'].includes(delivery.approvalStatus)) return res.status(409).json({ error: 'Edite o conteúdo para criar uma nova versão antes de reenviar.' });
 
   // Check if closed version exists
   let currentVersion = delivery.versions.find(v => v.versionNumber === delivery.currentVersionNumber);
@@ -446,6 +464,9 @@ router.post('/:id/approval-decision', requireAuth, (req: AuthenticatedRequest, r
       message: `A decisão foi recusada: você tentou aprovar a versão v${versionNumber}, mas a versão vigente no servidor é v${delivery.currentVersionNumber}. Por favor atualize a página e revise a versão atual.`
     });
   }
+
+  if (delivery.visibility !== 'shared' || delivery.approvalStatus !== 'aguardando_aprovacao') return res.status(409).json({ error: 'Esta versão não está disponível para decisão.' });
+  if (currentUser.role !== 'client_approver' || (delivery.designatedApproverId && delivery.designatedApproverId !== currentUser.id)) return res.status(403).json({ error: 'A decisão pertence ao aprovador designado do cliente.' });
 
   // AC10: Adjustments or Rejection REQUIRES non-empty feedback notes
   if ((decision === 'ajustes_solicitados' || decision === 'reprovado') && (!feedbackNotes || !feedbackNotes.trim())) {
@@ -661,6 +682,22 @@ router.post('/:id/reschedule', requireAuth, requireStaff, (req: AuthenticatedReq
   if (!newDate) {
     return res.status(400).json({ error: 'Nova data é obrigatória.' });
   }
+
+  if (!Number.isFinite(new Date(newDate).getTime())) return res.status(400).json({ error: 'Data inválida.' });
+  if (delivery.productionStatus === 'publicado') return res.status(409).json({ error: 'Não é possível remarcar uma entrega publicada.' });
+  if (newDate === delivery.scheduledPublicationDate) return res.json({ delivery, message: 'Data mantida.' });
+  const now = new Date().toISOString();
+  const currentVersion = delivery.versions.find(v => v.versionNumber === delivery.currentVersionNumber);
+  const frozen = currentVersion?.decision || delivery.approvalStatus !== 'nao_solicitado';
+  if (frozen) {
+    delivery.currentVersionNumber++;
+    delivery.approvalStatus = 'nao_solicitado';
+    delivery.productionStatus = 'em_producao';
+    delivery.isScheduledConfirmed = false;
+  }
+  const snapshot: DeliveryVersion = {versionNumber:delivery.currentVersionNumber,title:delivery.title,briefing:delivery.briefing,copywriting:delivery.copywriting,mediaUrls:[...delivery.mediaUrls],channel:delivery.channel,scheduledPublicationDate:newDate,changeSummary:reason || 'Remarcação de publicação',createdAt:now,createdByUserId:req.user!.id,createdByName:req.user!.name};
+  if (frozen || !currentVersion) delivery.versions.push(snapshot);
+  else Object.assign(currentVersion,snapshot);
 
   // Preserve original scheduled publication date if not yet recorded (RF23, AC11)
   if (!delivery.originalScheduledPublicationDate && delivery.scheduledPublicationDate) {

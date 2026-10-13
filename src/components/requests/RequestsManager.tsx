@@ -1,3 +1,4 @@
+import { ClientName, useClientName } from '../../contexts/ClientsContext';
 import React, { useState, useEffect } from 'react';
 import { ClientRequest, Channel, DeliveryPriority, Client } from '../../types';
 import { api } from '../../lib/api';
@@ -197,7 +198,7 @@ export const RequestsManager: React.FC<RequestsManagerProps> = ({ onDeliveryCrea
                     <div className="flex items-center gap-2 flex-wrap mb-1">
                       {req.channel && <ChannelIcon channel={req.channel} className="w-3.5 h-3.5" />}
                       <span className="font-semibold text-neutral-800">
-                        {req.clientId === 'cli_solartech' ? 'SolarTech Brasil' : 'Nexa Logística'}
+                        <ClientName id={req.clientId}/>
                       </span>
                       <span className="text-neutral-300">·</span>
                       <span className="text-[11px] text-neutral-500">
