@@ -1,3 +1,5 @@
+import { ClientsContext } from './contexts/ClientsContext';
+import { BrandLibrary } from './components/brand/BrandLibrary';
 import React, { useState, useEffect } from 'react';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { TopBar } from './components/common/TopBar';
@@ -12,7 +14,6 @@ import { ClientPortal } from './components/portal/ClientPortal';
 import { RequestsManager } from './components/requests/RequestsManager';
 import { MetricsDashboard } from './components/metrics/MetricsDashboard';
 import { AdminPanel } from './components/admin/AdminPanel';
-import { AcceptanceCriteriaRunner } from './components/testing/AcceptanceCriteriaRunner';
 import { NotificationsDrawer } from './components/notifications/NotificationsDrawer';
 import { StaffOverview } from './components/dashboard/StaffOverview';
 import { Delivery, Client, ProductionStatus } from './types';
@@ -51,7 +52,13 @@ function MainLayout() {
   };
 
   useEffect(() => {
-    fetchCoreData();
+    setSelectedDelivery(null);
+    setDeliveries([]);
+    setClients([]);
+    setLoading(true);
+    setError(null);
+    setActiveTab('overview');
+    if (user) fetchCoreData();
   }, [user?.id]);
 
   // Handle client portal tab defaults
@@ -90,7 +97,7 @@ function MainLayout() {
   const currentClient = clients.find(c => c.id === user?.clientId) || null;
 
   return (
-    <div className="flex flex-col h-screen w-screen overflow-hidden bg-neutral-100 font-sans">
+    <ClientsContext.Provider value={clients}><div className="flex flex-col h-screen w-screen overflow-hidden bg-neutral-100 font-sans">
       {/* TopBar with single line brand, role status and profile switcher */}
       <TopBar
         currentViewTitle={getTabTitle(activeTab)}
@@ -109,7 +116,7 @@ function MainLayout() {
 
         {/* Main Content Area */}
         <main className="flex-1 flex flex-col min-w-0 overflow-hidden bg-white">
-          {loading ? (
+          {error ? <div role="alert" className="p-6 text-red-700">{error}<button className="ml-4 underline" onClick={() => {setError(null); fetchCoreData();}}>Tentar novamente</button></div> : loading ? (
             <div className="flex-1 flex items-center justify-center text-xs text-neutral-500 font-medium">
               Carregando dados da operação Commet...
             </div>
@@ -143,14 +150,7 @@ function MainLayout() {
                 />
               )}
 
-              {activeTab === 'brand-kit' && (
-                <ClientPortal
-                  deliveries={deliveries}
-                  client={currentClient}
-                  onOpenDetails={(d) => setSelectedDelivery(d)}
-                  onRequestDemand={() => setActiveTab('requests')}
-                />
-              )}
+              {activeTab === 'brand-kit' && <BrandLibrary key={user?.id} clients={clients} />}
 
               {activeTab === 'my-tasks' && (
                 <MyTasksView
@@ -202,7 +202,7 @@ function MainLayout() {
               )}
 
               {activeTab === 'testing' && (
-                <AcceptanceCriteriaRunner />
+                <p className="p-6">Os testes de regressão são executados fora da base operacional com npm test.</p>
               )}
             </>
           )}
@@ -232,14 +232,20 @@ function MainLayout() {
         onClose={() => setNotificationsOpen(false)}
         onRefreshUnread={() => fetchCoreData()}
       />
-    </div>
+    </div></ClientsContext.Provider>
   );
 }
 
+function AuthenticatedLayout() {
+  const { user, loading } = useAuth();
+  if (loading) return <p className="p-8">Carregando sessão…</p>;
+  if (!user) return <p role="alert" className="p-8">Não foi possível carregar a sessão do piloto. Verifique se o servidor está disponível e recarregue.</p>;
+  return <MainLayout key={user.id}/>;
+}
 export default function App() {
   return (
     <AuthProvider>
-      <MainLayout />
+      <AuthenticatedLayout />
     </AuthProvider>
   );
 }

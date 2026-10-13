@@ -47,19 +47,6 @@ router.get('/demo-users', (req: Request, res: Response) => {
   return res.json({ users });
 });
 
-// Reset database to initial seed for automated or manual test runs
-router.post('/reset-db', (req: Request, res: Response) => {
-  const freshData = db.resetToDefault();
-  return res.json({
-    success: true,
-    message: 'Banco de dados reinicializado para o estado padrão de demonstração e homologação.',
-    counts: {
-      users: freshData.users.length,
-      clients: freshData.clients.length,
-      deliveries: freshData.deliveries.length,
-      tasks: freshData.tasks.length
-    }
-  });
-});
+router.post('/reset-db', requireAuth, (_req, res) => res.status(403).json({ error: 'Reset pela interface desativado. Use uma base separada para testes.' }));
 
 export default router;

@@ -1,3 +1,5 @@
+import 'dotenv/config';
+import brandAssetsRouter from './server/routes/brandAssets.js';
 import express, { Request, Response } from 'express';
 import path from 'path';
 import dotenv from 'dotenv';
@@ -33,6 +35,7 @@ app.get('/api/health', (req: Request, res: Response) => {
 });
 
 // API Routes
+app.use('/api/brand', brandAssetsRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/users', usersRouter);
 app.use('/api/clients', clientsRouter);
@@ -69,6 +72,7 @@ app.get('/api/audit-logs', requireAuth, (req: AuthenticatedRequest, res: Respons
 });
 
 async function startServer() {
+  if (isProd) throw new Error('Autenticação ainda é de piloto. Configure autenticação real antes de expor em produção.');
   if (!isProd) {
     const { createServer: createViteServer } = await import('vite');
     const vite = await createViteServer({
@@ -84,8 +88,8 @@ async function startServer() {
     });
   }
 
-  app.listen(PORT, '0.0.0.0', () => {
-    console.log(`Commet Ecosystem Server running on http://0.0.0.0:${PORT}`);
+  app.listen(PORT, '127.0.0.1', () => {
+    console.log(`Commet Ecosystem Server running on http://127.0.0.1:${PORT}`);
   });
 }
 

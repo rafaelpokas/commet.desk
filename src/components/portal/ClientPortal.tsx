@@ -200,16 +200,16 @@ export const ClientPortal: React.FC<ClientPortalProps> = ({
                   <div className="flex items-center gap-1.5">
                     <div
                       className="w-5 h-5 rounded border border-neutral-300"
-                      style={{ backgroundColor: client.brandKit.primaryColor || '#0284c7' }}
+                      style={{ backgroundColor: client.brandKit.primaryColor || 'transparent' }}
                     />
-                    <span className="font-mono">{client.brandKit.primaryColor || '#0284c7'}</span>
+                    <span className="font-mono">{client.brandKit.primaryColor || 'A confirmar'}</span>
                   </div>
                   <div className="flex items-center gap-1.5">
                     <div
                       className="w-5 h-5 rounded border border-neutral-300"
-                      style={{ backgroundColor: client.brandKit.secondaryColor || '#f59e0b' }}
+                      style={{ backgroundColor: client.brandKit.secondaryColor || 'transparent' }}
                     />
-                    <span className="font-mono">{client.brandKit.secondaryColor || '#f59e0b'}</span>
+                    <span className="font-mono">{client.brandKit.secondaryColor || 'A confirmar'}</span>
                   </div>
                 </div>
               </div>
@@ -217,7 +217,7 @@ export const ClientPortal: React.FC<ClientPortalProps> = ({
               <div className="p-4 bg-neutral-50 rounded-lg space-y-2 border border-neutral-200">
                 <span className="font-semibold text-neutral-700">Tipografia de Referência:</span>
                 <div className="font-mono text-neutral-800">
-                  {client.brandKit.fonts?.join(', ') || 'Plus Jakarta Sans'}
+                  {client.brandKit.fonts?.join(', ') || 'A confirmar pelo brandbook'}
                 </div>
               </div>
             </div>

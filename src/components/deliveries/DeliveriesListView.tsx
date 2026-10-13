@@ -1,3 +1,4 @@
+import { ClientName, useClientName } from '../../contexts/ClientsContext';
 import React, { useState } from 'react';
 import { Delivery, Client, ProductionStatus } from '../../types';
 import { ChannelIcon, ProductionStatusBadge, ApprovalStatusBadge, PriorityIndicator } from '../common/StatusBadge';
@@ -105,7 +106,7 @@ export const DeliveriesListView: React.FC<DeliveriesListViewProps> = ({
                     </div>
                   </td>
                   <td className="p-3 text-neutral-600">
-                    {d.clientId === 'cli_solartech' ? 'SolarTech' : 'Nexa Log'}
+                    <ClientName id={d.clientId}/>
                   </td>
                   <td className="p-3 font-mono font-semibold text-neutral-500">
                     v{d.currentVersionNumber}
