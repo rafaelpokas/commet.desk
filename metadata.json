@@ -1,0 +1,6 @@
+{
+  "name": "Commet - Ecossistema de Gestão de Marketing e Portal do Cliente",
+  "description": "Plataforma centralizada para gestão de clientes, obrigações mensais, campanhas, aprovação de entregas por canal e portal isolado de clientes da Commet.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
