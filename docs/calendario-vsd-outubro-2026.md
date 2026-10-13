@@ -15,3 +15,21 @@ Pesquisa em 13/10/2026: [NR-1 e materiais oficiais do Ministério do Trabalho](h
 O endereço [cursos VSD](https://cursos.voceeseudireito.com.br/) foi indicado pelo usuário; seu conteúdo não pôde ser recuperado na pesquisa. Confirmar a oferta atual e CTA com Marina antes de publicar. Não afirmar datas de multas, conformidade automática, diagnóstico clínico ou certificação de adequação. A revisão jurídica da redação é uma tarefa explícita.
 
 Direção visual baseada nas preferências fornecidas: autenticidade, sofisticação, fotos reais da Marina e preservação do rosto. A busca nos arquivos disponíveis não localizou um brandbook oficial. Logos, cores e fontes devem vir dos arquivos enviados ao acervo, sem inferir a identidade a partir de peças antigas.
+
+
+## Pedidos reais de Marina · lote de 13/10/2026
+
+As três propostas acima foram preservadas. Acrescentadas seis entregas com 19 artes e textos, em revisão interna. Horário proposto: 12h de São Paulo; nenhuma publicação, aprovação ou agendamento confirmado.
+
+| Data proposta | Conteúdo | Formato |
+| --- | --- | --- |
+| 2026-10-14 | Cobrar resultados exige critério e respeito | carrossel |
+| 2026-10-14 | Story · qual dúvida trabalhista sua empresa tem? | stories |
+| 2026-10-16 | Marina Gerdully · experiência que se conecta à gestão | carrossel |
+| 2026-10-16 | Story · compromisso com decisões mais conscientes | stories |
+| 2026-10-19 | Story · clareza para orientar a gestão | stories |
+| 2026-10-20 | Acúmulo de funções: o que sua empresa precisa analisar | carrossel |
+
+As imagens prontas estão em `public/content/vsd/2026-10`; os textos e referências em `server/marinaOctober.ts`. A enquete precisa do sticker nativo do Instagram. O texto de apresentação evita a promessa de blindagem absoluta e usa apenas informações profissionais fornecidas por Marina e seu site. Não foram inventados hábitos pessoais, resultados ou clientes.
+
+Para incorporar o lote a uma base VSD existente, pare o app, faça backup e execute `npm run import:marina-october` com o mesmo DATA_DIR da instalação. O importador adiciona apenas IDs ausentes e preserva as entregas anteriores. Se não houver cli_vsd, recusa a importação. A pasta antiga de demonstração com SolarTech/Nexa não foi alterada.

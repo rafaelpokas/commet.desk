@@ -2,6 +2,8 @@
 
 Piloto local de operação de marketing da Commet, com portal VSD e acervo privado de identidade visual.
 
+Lote de 13/10: seis conteúdos da Marina com 19 artes prontas (dois carrosséis educativos, apresentação profissional e três stories). O calendário preserva as três propostas anteriores e acrescenta esse lote em revisão interna. Instalações novas recebem as nove entregas. Para uma base VSD existente, com o app parado e o DATA_DIR correto, execute `npm run import:marina-october`; o importador cria backup, não duplica IDs e não modifica decisões existentes. As datas são propostas, não publicações agendadas ou aprovadas. Consulte `docs/calendario-vsd-outubro-2026.md`.
+
 ## Executar
 
 Node.js 22.12+ (validado com 24), npm e um único processo do servidor.

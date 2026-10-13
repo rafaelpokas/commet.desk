@@ -1,3 +1,4 @@
+import { addMarinaOctoberBatch } from './marinaOctober.js';
 import type { DatabaseSchema } from './db.js';
 import type { Delivery } from './types.js';
 
@@ -37,7 +38,7 @@ export function createVsdSeed(): DatabaseSchema {
     approvalStatus: 'nao_solicitado', designatedApproverId: 'usr_marina', isScheduledConfirmed: false,
     createdAt: now, updatedAt: now
   }));
-  return {
+  const data: DatabaseSchema = {
     users: [
       { id: 'usr_admin', name: 'Rafael França', email: 'rafael@example.invalid', role: 'admin', title: 'Commet · direção e criação', status: 'active', createdAt: now },
       { id: 'usr_operador', name: 'Operador de demonstração', email: 'operador@example.invalid', role: 'employee', title: 'Perfil de teste · não é funcionário cadastrado', status: 'active', createdAt: now },
@@ -53,4 +54,6 @@ export function createVsdSeed(): DatabaseSchema {
     deliveries, tasks: deliveries.flatMap(d => ['Validar pauta e fontes com Marina', 'Redigir slides e legenda', 'Criar arte usando a identidade oficial', 'Revisar e enviar para aprovação', 'Publicar manualmente e registrar evidência'].map((title, i) => ({ id: `${d.id}_task_${i}`, deliveryId: d.id, title, type: (['revisao', 'redacao', 'design', 'revisao', 'publicacao'] as const)[i], completed: false, isInternal: true, version: 1 }))),
     clientRequests: [], comments: [], notifications: [], auditLogs: [], brandAssets: []
   };
+  addMarinaOctoberBatch(data);
+  return data;
 }
