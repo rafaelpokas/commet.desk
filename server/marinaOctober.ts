@@ -52,13 +52,13 @@ const content = [
       "cobranca/07.png"
     ],
     "mediaUrls": [
-      "/content/vsd/2026-10/cobranca/01.jpg",
-      "/content/vsd/2026-10/cobranca/02.jpg",
-      "/content/vsd/2026-10/cobranca/03.jpg",
-      "/content/vsd/2026-10/cobranca/04.jpg",
-      "/content/vsd/2026-10/cobranca/05.jpg",
-      "/content/vsd/2026-10/cobranca/06.jpg",
-      "/content/vsd/2026-10/cobranca/07.jpg"
+      "/content/vsd/2026-10/v2/cobranca/01.jpg",
+      "/content/vsd/2026-10/v2/cobranca/02.jpg",
+      "/content/vsd/2026-10/v2/cobranca/03.jpg",
+      "/content/vsd/2026-10/v2/cobranca/04.jpg",
+      "/content/vsd/2026-10/v2/cobranca/05.jpg",
+      "/content/vsd/2026-10/v2/cobranca/06.jpg",
+      "/content/vsd/2026-10/v2/cobranca/07.jpg"
     ]
   },
   {
@@ -86,8 +86,8 @@ const content = [
       "apresentacao/02.png"
     ],
     "mediaUrls": [
-      "/content/vsd/2026-10/apresentacao/01.jpg",
-      "/content/vsd/2026-10/apresentacao/02.jpg"
+      "/content/vsd/2026-10/v2/apresentacao/01.jpg",
+      "/content/vsd/2026-10/v2/apresentacao/02.jpg"
     ]
   },
   {
@@ -140,13 +140,13 @@ const content = [
       "acumulo/07.png"
     ],
     "mediaUrls": [
-      "/content/vsd/2026-10/acumulo/01.jpg",
-      "/content/vsd/2026-10/acumulo/02.jpg",
-      "/content/vsd/2026-10/acumulo/03.jpg",
-      "/content/vsd/2026-10/acumulo/04.jpg",
-      "/content/vsd/2026-10/acumulo/05.jpg",
-      "/content/vsd/2026-10/acumulo/06.jpg",
-      "/content/vsd/2026-10/acumulo/07.jpg"
+      "/content/vsd/2026-10/v2/acumulo/01.jpg",
+      "/content/vsd/2026-10/v2/acumulo/02.jpg",
+      "/content/vsd/2026-10/v2/acumulo/03.jpg",
+      "/content/vsd/2026-10/v2/acumulo/04.jpg",
+      "/content/vsd/2026-10/v2/acumulo/05.jpg",
+      "/content/vsd/2026-10/v2/acumulo/06.jpg",
+      "/content/vsd/2026-10/v2/acumulo/07.jpg"
     ]
   },
   {
@@ -168,7 +168,7 @@ const content = [
       "story-enquete/01.png"
     ],
     "mediaUrls": [
-      "/content/vsd/2026-10/story-enquete/01.jpg"
+      "/content/vsd/2026-10/v2/story-enquete/01.jpg"
     ]
   },
   {
@@ -185,12 +185,12 @@ const content = [
         "story"
       ]
     ],
-    "caption": "Story de conexão com foto real já usada no site. Texto atemporal: não afirma que a foto foi tirada nesta semana nem inventa bastidores. Sugestão: compartilhar depois da apresentação profissional.",
+    "caption": "Story de conexão com cena conceitual gerada. Texto atemporal: não afirma que a foto foi tirada nesta semana nem inventa bastidores. Sugestão: compartilhar depois da apresentação profissional.",
     "files": [
       "story-conexao/01.png"
     ],
     "mediaUrls": [
-      "/content/vsd/2026-10/story-conexao/01.jpg"
+      "/content/vsd/2026-10/v2/story-conexao/01.jpg"
     ]
   },
   {
@@ -207,12 +207,12 @@ const content = [
         "story"
       ]
     ],
-    "caption": "Story de autoridade com foto real do site, sem alegar que registra a rotina de hoje. Pode receber o sticker nativo de link para https://lp.voceeseudireito.com.br/ com o rótulo Conheça minha atuação.",
+    "caption": "Story de autoridade com imagem conceitual gerada, sem alegar que registra a rotina de hoje. Pode receber o sticker nativo de link para https://lp.voceeseudireito.com.br/ com o rótulo Conheça minha atuação.",
     "files": [
       "story-autoridade/01.png"
     ],
     "mediaUrls": [
-      "/content/vsd/2026-10/story-autoridade/01.jpg"
+      "/content/vsd/2026-10/v2/story-autoridade/01.jpg"
     ]
   }
 ] as const;
@@ -226,15 +226,15 @@ export function addMarinaOctoberBatch(data: DatabaseSchema): number {
     const id = `del_vsd_marina_202610_${item.id}`;
     if (data.deliveries.some(d => d.id === id)) continue;
     const scheduled = `${item.date}T15:00:00.000Z`;
-    const briefing = `${item.origin}\nReferência: ${item.ref}\n\n${item.slides.map((s,i)=>`Slide ${i+1}: ${s[0]}\n${s[1]}`).join('\n\n')}\n\nArtes concluídas em 13/10/2026. Fotos e logo do site público https://lp.voceeseudireito.com.br/. Fontes Playfair Display e Montserrat; roxo #3D1F4F, lavanda #E7E0F2 e dourado #C5A059. A foto existente foi preservada, sem reconstrução do rosto. Datas editoriais propostas, 12h de São Paulo. Revisão interna pendente; aprovação de Marina não solicitada. Stories de enquete exigem sticker nativo. Não afirmar que foto de acervo é bastidor de hoje.\nFontes jurídicas: CLT, arts. 456 e 468 (https://www.planalto.gov.br/ccivil_03/decreto-lei/del5452compilado.htm); TST, material de prevenção ao assédio e jurisprudência. A apresentação usa os 18 anos e fundação da VSD informados pela própria Marina; sem prometer eliminação de riscos.`;
+    const briefing = `${item.origin}\nReferência: ${item.ref}\n\n${item.slides.map((s,i)=>`Slide ${i+1}: ${s[0]}\n${s[1]}`).join('\n\n')}\n\nCampanha visual V2 reconstruída em 13/10/2026, após revisão de Rafael. Dez visuais publicitários gerados com image_gen integrado; cenas conceituais, sem alegação de clientes ou bastidores reais. Composição de apresentação usa foto pública da Marina como referência de identidade; demais cenas são geradas. Logo oficial do site https://lp.voceeseudireito.com.br/. Fontes Playfair Display e Montserrat; roxo #3D1F4F, lavanda #E7E0F2 e dourado #C5A059. Datas editoriais propostas, 12h de São Paulo. Revisão interna pendente; aprovação de Marina não solicitada. Stories de enquete exigem sticker nativo. Não afirmar que foto de acervo é bastidor de hoje.\nFontes jurídicas: CLT, arts. 456 e 468 (https://www.planalto.gov.br/ccivil_03/decreto-lei/del5452compilado.htm); TST, material de prevenção ao assédio e jurisprudência. A apresentação usa os 18 anos e fundação da VSD informados pela própria Marina; sem prometer eliminação de riscos.`;
     const d: Delivery = {
       id, clientId:'cli_vsd', competenceMonth:'2026-10',campaignId:'cmp_vsd_marina_202610',
       title:item.title,channel:'instagram',format:item.format,priority:'alta',visibility:'shared',
       primaryAssigneeId:'usr_admin',primaryAssigneeName:'Rafael',productionStatus:'revisao_interna',isBlocked:false,
       internalDeadline:'2026-10-14T12:00:00.000Z',approvalDeadline:`${item.date}T14:00:00.000Z`,
       originalScheduledPublicationDate:scheduled,scheduledPublicationDate:scheduled,
-      briefing,copywriting:item.caption,mediaUrls:[...item.mediaUrls],currentVersionNumber:1,
-      versions:[{versionNumber:1,title:item.title,briefing,copywriting:item.caption,mediaUrls:[...item.mediaUrls],channel:'instagram',scheduledPublicationDate:scheduled,changeSummary:'Artes e textos produzidos a partir dos pedidos de outubro.',createdAt:now,createdByUserId:'usr_admin',createdByName:'Rafael'}],
+      briefing,copywriting:item.caption,mediaUrls:[...item.mediaUrls],currentVersionNumber:2,
+      versions:[1,2].map(versionNumber=>({versionNumber,title:item.title,briefing:versionNumber===1?'Primeira composição editorial, substituída após revisão de Rafael.':briefing,copywriting:item.caption,mediaUrls:item.mediaUrls.map(u=>versionNumber===1?u.replace('/2026-10/v2/','/2026-10/'):u),channel:'instagram' as const,scheduledPublicationDate:scheduled,changeSummary:versionNumber===1?'Primeira composição editorial.':'Campanha refeita com dez visuais publicitários gerados.',createdAt:now,createdByUserId:'usr_admin',createdByName:'Rafael'})),
       approvalStatus:'nao_solicitado',designatedApproverId:'usr_marina',isScheduledConfirmed:false,createdAt:now,updatedAt:now
     };
     data.deliveries.push(d);
@@ -251,4 +251,24 @@ export function addMarinaOctoberBatch(data: DatabaseSchema): number {
   if (!client.brandKit.logoUrl) client.brandKit.logoUrl = '/content/vsd/2026-10/logo.png';
   client.brandKit.referenceLinks = [...new Set([...(client.brandKit.referenceLinks||[]),'https://lp.voceeseudireito.com.br/',...content.map(c=>c.ref)])];
   return added;
+}
+
+// Explicit upgrade for an existing, unpublished batch. Dates and old versions stay intact.
+export function upgradeMarinaOctoberArtwork(data: DatabaseSchema): number {
+  if (!data.clients.some(c=>c.id==='cli_vsd')) return 0;
+  const desired: DatabaseSchema = {...data, deliveries:[], tasks:[], campaigns:[]};
+  addMarinaOctoberBatch(desired);
+  let updated = 0;
+  for (const fresh of desired.deliveries) {
+    const existing = data.deliveries.find(d=>d.id===fresh.id);
+    if (!existing || existing.productionStatus==='publicado' || JSON.stringify(existing.mediaUrls)===JSON.stringify(fresh.mediaUrls)) continue;
+    const now = new Date().toISOString();
+    const versions = [...existing.versions];
+    if (!versions.some(v=>v.versionNumber===existing.currentVersionNumber)) versions.push({versionNumber:existing.currentVersionNumber,title:existing.title,briefing:existing.briefing,copywriting:existing.copywriting,mediaUrls:[...existing.mediaUrls],channel:existing.channel,scheduledPublicationDate:existing.scheduledPublicationDate,createdAt:existing.updatedAt,createdByUserId:'usr_admin',createdByName:'Rafael'});
+    const number = existing.currentVersionNumber+1;
+    versions.push({...fresh.versions.at(-1)!,versionNumber:number,scheduledPublicationDate:existing.scheduledPublicationDate,createdAt:now});
+    Object.assign(existing,{briefing:fresh.briefing,copywriting:fresh.copywriting,mediaUrls:[...fresh.mediaUrls],versions,currentVersionNumber:number,approvalStatus:'nao_solicitado',productionStatus:'revisao_interna',isScheduledConfirmed:false,updatedAt:now});
+    updated++;
+  }
+  return updated;
 }

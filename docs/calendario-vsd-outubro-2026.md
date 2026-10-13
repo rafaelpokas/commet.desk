@@ -33,3 +33,7 @@ As três propostas acima foram preservadas. Acrescentadas seis entregas com 19 a
 As imagens prontas estão em `public/content/vsd/2026-10`; os textos e referências em `server/marinaOctober.ts`. A enquete precisa do sticker nativo do Instagram. O texto de apresentação evita a promessa de blindagem absoluta e usa apenas informações profissionais fornecidas por Marina e seu site. Não foram inventados hábitos pessoais, resultados ou clientes.
 
 Para incorporar o lote a uma base VSD existente, pare o app, faça backup e execute `npm run import:marina-october` com o mesmo DATA_DIR da instalação. O importador adiciona apenas IDs ausentes e preserva as entregas anteriores. Se não houver cli_vsd, recusa a importação. A pasta antiga de demonstração com SolarTech/Nexa não foi alterada.
+
+## Campanha visual V2
+
+A composição editorial inicial foi substituída por 19 peças com dez visuais publicitários gerados via image_gen integrado, fotografia conceitual, profundidade e luz roxa/dourada. A apresentação parte da foto da Marina fornecida pelo site. As imagens geradas não documentam clientes, reuniões ou bastidores reais. Arquivos finais V2: `public/content/vsd/2026-10/v2`. As imagens anteriores permanecem para o histórico V1. O importador atualiza apenas as peças deste lote ainda não publicadas, preserva as datas e versões e exige nova revisão/aprovação.

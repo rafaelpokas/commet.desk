@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { createVsdSeed } from '../server/seed.js';
-import { addMarinaOctoberBatch } from '../server/marinaOctober.js';
+import { addMarinaOctoberBatch, upgradeMarinaOctoberArtwork } from '../server/marinaOctober.js';
 
 test('lote Marina é idempotente e mantém conteúdo e decisões existentes', () => {
   const data = createVsdSeed();
@@ -27,4 +27,20 @@ test('lote não altera base que não contém VSD', () => {
   const before = JSON.stringify(data);
   assert.equal(addMarinaOctoberBatch(data), 0);
   assert.equal(JSON.stringify(data), before);
+});
+
+test('upgrade visual mantém versão antiga e datas e invalida aprovação da peça alterada', () => {
+  const data = createVsdSeed();
+  const item = data.deliveries.find(d=>d.id.endsWith('_apresentacao'))!;
+  const old = item.versions[0];
+  Object.assign(item,{mediaUrls:[...old.mediaUrls],versions:[old],currentVersionNumber:1,approvalStatus:'aprovado',productionStatus:'pronto_para_publicar',isScheduledConfirmed:true});
+  const date = item.scheduledPublicationDate;
+  const snapshot = JSON.stringify(old);
+  assert.equal(upgradeMarinaOctoberArtwork(data),1);
+  assert.equal(item.currentVersionNumber,2);
+  assert.equal(JSON.stringify(item.versions[0]),snapshot);
+  assert.equal(item.scheduledPublicationDate,date);
+  assert.equal(item.approvalStatus,'nao_solicitado');
+  assert.equal(item.isScheduledConfirmed,false);
+  assert.equal(upgradeMarinaOctoberArtwork(data),0);
 });
