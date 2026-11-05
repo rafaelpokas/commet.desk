@@ -1,3 +1,4 @@
+import { ClientName, useClientName } from '../../contexts/ClientsContext';
 import React, { useState } from 'react';
 import { Delivery } from '../../types';
 import { ChannelIcon, ApprovalStatusBadge } from '../common/StatusBadge';
@@ -14,9 +15,14 @@ export const EditorialCalendar: React.FC<EditorialCalendarProps> = ({
   onOpenDetails,
   timezone = 'America/Sao_Paulo'
 }) => {
-  // Calendar month state (defaults to October 2026 based on seed data)
-  const [currentYear, setCurrentYear] = useState(2026);
-  const [currentMonth, setCurrentMonth] = useState(9); // 0-indexed: 9 is October
+  const dateParts = (value: string | Date) => {
+    const parts = new Intl.DateTimeFormat('en-CA', { timeZone: timezone, year: 'numeric', month: 'numeric', day: 'numeric' }).formatToParts(new Date(value));
+    const n = (key: string) => Number(parts.find(p => p.type === key)?.value);
+    return { year: n('year'), month: n('month') - 1, day: n('day') };
+  };
+  const today = dateParts(new Date());
+  const [currentYear, setCurrentYear] = useState(today.year);
+  const [currentMonth, setCurrentMonth] = useState(today.month);
   const [viewMode, setViewMode] = useState<'month' | 'list'>('month');
 
   const monthNames = [
@@ -56,9 +62,9 @@ export const EditorialCalendar: React.FC<EditorialCalendarProps> = ({
 
   for (const d of deliveries) {
     if (d.scheduledPublicationDate) {
-      const date = new Date(d.scheduledPublicationDate);
-      if (date.getFullYear() === currentYear && date.getMonth() === currentMonth) {
-        const day = date.getDate();
+      const date = dateParts(d.scheduledPublicationDate);
+      if (date.year === currentYear && date.month === currentMonth) {
+        const day = date.day;
         if (deliveriesByDay[day]) {
           deliveriesByDay[day].push(d);
         }
@@ -147,7 +153,7 @@ export const EditorialCalendar: React.FC<EditorialCalendarProps> = ({
               {Array.from({ length: daysInMonth }).map((_, i) => {
                 const day = i + 1;
                 const dayDeliveries = deliveriesByDay[day] || [];
-                const isToday = currentYear === 2026 && currentMonth === 9 && day === 13;
+                const isToday = currentYear === today.year && currentMonth === today.month && day === today.day;
 
                 return (
                   <div
@@ -185,7 +191,7 @@ export const EditorialCalendar: React.FC<EditorialCalendarProps> = ({
                             <span className="truncate">{d.title}</span>
                           </div>
                           <div className="text-[10px] text-neutral-500">
-                            {d.approvalStatus === 'aprovado' ? '✓ Aprovado' : 'Aguardando'}
+                            <ApprovalStatusBadge status={d.approvalStatus} />
                           </div>
                         </button>
                       ))}
@@ -204,7 +210,7 @@ export const EditorialCalendar: React.FC<EditorialCalendarProps> = ({
           </h3>
           <div className="border border-neutral-200 rounded-lg divide-y divide-neutral-100">
             {deliveries
-              .filter(d => d.scheduledPublicationDate)
+              .filter(d => d.scheduledPublicationDate && dateParts(d.scheduledPublicationDate).year === currentYear && dateParts(d.scheduledPublicationDate).month === currentMonth)
               .sort((a, b) => new Date(a.scheduledPublicationDate!).getTime() - new Date(b.scheduledPublicationDate!).getTime())
               .map(d => (
                 <div
@@ -217,7 +223,7 @@ export const EditorialCalendar: React.FC<EditorialCalendarProps> = ({
                     <div>
                       <h4 className="font-semibold text-neutral-900 truncate">{d.title}</h4>
                       <div className="text-neutral-500 text-[11px] mt-0.5">
-                        {d.clientId === 'cli_solartech' ? 'SolarTech' : 'Nexa Log'} · Responsável: {d.primaryAssigneeName}
+                        <ClientName id={d.clientId}/> · Responsável: {d.primaryAssigneeName}
                       </div>
                     </div>
                   </div>
@@ -226,6 +232,7 @@ export const EditorialCalendar: React.FC<EditorialCalendarProps> = ({
                     <ApprovalStatusBadge status={d.approvalStatus} />
                     <div className="text-right font-mono text-[11px] text-neutral-600">
                       {new Date(d.scheduledPublicationDate!).toLocaleString('pt-BR', {
+                        timeZone: timezone,
                         day: '2-digit',
                         month: '2-digit',
                         hour: '2-digit',
@@ -260,7 +267,7 @@ export const EditorialCalendar: React.FC<EditorialCalendarProps> = ({
                   <span className="truncate">{d.title}</span>
                 </div>
                 <div className="text-[11px] text-neutral-500">
-                  {d.clientId === 'cli_solartech' ? 'SolarTech' : 'Nexa Log'}
+                  <ClientName id={d.clientId}/>
                 </div>
               </div>
             ))}

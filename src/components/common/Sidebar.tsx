@@ -1,3 +1,4 @@
+import { ClientName, useClientName } from '../../contexts/ClientsContext';
 import React from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import {
@@ -25,11 +26,11 @@ export type ActiveTab =
   | 'metrics'
   | 'admin'
   | 'approvals'
+  | 'archive'
   | 'brand-kit'
   | 'testing';
 
 interface SidebarProps {
-  clientName?: string;
   activeTab: ActiveTab;
   onSelectTab: (tab: ActiveTab) => void;
   pendingApprovalsCount?: number;
@@ -37,7 +38,6 @@ interface SidebarProps {
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
-  clientName,
   activeTab,
   onSelectTab,
   pendingApprovalsCount = 0,
@@ -52,11 +52,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
           {isClient ? 'Portal do Cliente' : 'Operação Interna'}
         </div>
         <div className="text-sm font-semibold text-neutral-900 truncate">
-          {isClient ? (clientName||'Portal do cliente') : 'Agência Commet'}
+          {isClient ? <ClientName id={user?.clientId}/> : 'Agência Commet'}
         </div>
       </div>
 
       <nav className="flex-1 p-3 space-y-1 overflow-y-auto text-sm">
+        <button onClick={()=>onSelectTab('archive')} className={`w-full flex items-center gap-3 px-3 py-2 rounded-md font-medium text-left ${activeTab==='archive'?'bg-neutral-900 text-white':'text-neutral-700 hover:bg-neutral-100'}`}><FolderOpen className="w-4 h-4"/><span>Acervo & Contexto</span></button>
         {/* CLIENT NAVIGATION */}
         {isClient && (
           <>
@@ -132,7 +133,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {/* STAFF NAVIGATION */}
         {isStaff && (
           <>
-            <button onClick={()=>onSelectTab('brand-kit')} className={`w-full flex items-center gap-3 px-3 py-2 rounded-md font-medium text-left ${activeTab==='brand-kit'?'bg-neutral-900 text-white':'text-neutral-700 hover:bg-neutral-100'}`}><FolderOpen className="w-4 h-4"/><span>Arquivos & Contexto</span></button>
             <button
               onClick={() => onSelectTab('overview')}
               className={`w-full flex items-center gap-3 px-3 py-2 rounded-md font-medium text-left transition-colors ${
@@ -224,20 +224,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </>
         )}
 
-        <div className="pt-4 mt-4 border-t border-neutral-100">
-          <div className="text-[11px] uppercase tracking-wider text-neutral-400 font-semibold px-3 mb-1">
-            Validação & Testes
-          </div>
-          <button
-            onClick={() => onSelectTab('testing')}
-            className={`w-full flex items-center gap-3 px-3 py-2 rounded-md font-medium text-left transition-colors ${
-              activeTab === 'testing' ? 'bg-neutral-900 text-white' : 'text-neutral-700 hover:bg-neutral-100'
-            }`}
-          >
-            <ShieldCheck className="w-4 h-4 shrink-0 text-emerald-600" />
-            <span>Homologação AC01-AC16</span>
-          </button>
-        </div>
+        {isStaff && <button onClick={() => onSelectTab('brand-kit')} className={`w-full flex items-center gap-3 px-3 py-2 rounded-md text-left ${activeTab === 'brand-kit' ? 'bg-neutral-900 text-white' : 'hover:bg-neutral-100'}`}><FolderOpen size={16}/>Identidade & referências</button>}
       </nav>
 
       {/* Footer Profile info */}

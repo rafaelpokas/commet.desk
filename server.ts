@@ -1,3 +1,5 @@
+import 'dotenv/config';
+import brandAssetsRouter from './server/routes/brandAssets.js';
 import express, { Request, Response } from 'express';
 import path from 'path';
 import dotenv from 'dotenv';
@@ -35,6 +37,7 @@ app.get('/api/health', (req: Request, res: Response) => {
 });
 
 // API Routes
+app.use('/api/brand', brandAssetsRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/users', usersRouter);
 app.use('/api/clients', clientsRouter);

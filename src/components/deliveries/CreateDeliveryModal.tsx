@@ -1,3 +1,4 @@
+import { currentCompetence, localDateTimeToIso } from '../../lib/dates';
 import React, { useState, useEffect } from 'react';
 import { Client, Channel, DeliveryPriority, DeliveryVisibility, User } from '../../types';
 import { api } from '../../lib/api';
@@ -16,17 +17,17 @@ export const CreateDeliveryModal: React.FC<CreateDeliveryModalProps> = ({
   onCreated,
   clients
 }) => {
-  const [clientId, setClientId] = useState(clients[0]?.id || 'cli_solartech');
-  const [competenceMonth, setCompetenceMonth] = useState('2026-10');
+  const [clientId, setClientId] = useState(clients[0]?.id || '');
+  const [competenceMonth, setCompetenceMonth] = useState(currentCompetence());
   const [title, setTitle] = useState('');
   const [channel, setChannel] = useState<Channel>('instagram');
   const [format, setFormat] = useState<string>('carrossel');
   const [priority, setPriority] = useState<DeliveryPriority>('media');
-  const [visibility, setVisibility] = useState<DeliveryVisibility>('shared');
+  const [visibility, setVisibility] = useState<DeliveryVisibility>('internal');
   const [briefing, setBriefing] = useState('');
   const [copywriting, setCopywriting] = useState('');
-  const [scheduledDate, setScheduledDate] = useState('2026-10-25T15:00');
-  const [mediaUrl, setMediaUrl] = useState('/src/assets/images/post_solartech_creative_1791862281613.jpg');
+  const [scheduledDate, setScheduledDate] = useState('');
+  const [mediaUrl, setMediaUrl] = useState('');
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -61,8 +62,9 @@ export const CreateDeliveryModal: React.FC<CreateDeliveryModalProps> = ({
         briefing: briefing.trim(),
         copywriting: copywriting.trim(),
         mediaUrls: mediaUrl ? [mediaUrl] : [],
-        scheduledPublicationDate: scheduledDate ? `${scheduledDate}:00Z` : undefined
+        scheduledPublicationDate: scheduledDate ? localDateTimeToIso(scheduledDate, clients.find(c=>c.id === clientId)?.timezone || 'America/Sao_Paulo') : undefined
       });
+      setTitle(''); setBriefing(''); setCopywriting(''); setMediaUrl(''); setScheduledDate('');
       onCreated();
       onClose();
     } catch (err: any) {
@@ -95,6 +97,7 @@ export const CreateDeliveryModal: React.FC<CreateDeliveryModalProps> = ({
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4 text-xs">
+          <div className="p-3 bg-violet-50 rounded-lg text-violet-900"><strong>Referência da marca</strong><p className="mt-1 whitespace-pre-wrap">{clients.find(c=>c.id === clientId)?.brandKit.guidelinesNotes || 'Adicione as diretrizes e arquivos oficiais em Identidade & referências.'}</p><p className="mt-2">Datas no fuso {clients.find(c=>c.id===clientId)?.timezone || 'America/Sao_Paulo'}. Consulte o acervo atualizado antes de criar a arte.</p></div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
               <label className="block font-semibold text-neutral-700 mb-1">Cliente</label>

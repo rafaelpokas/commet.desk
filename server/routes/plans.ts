@@ -59,6 +59,9 @@ router.post('/generate', requireAuth, requireStaff, (req: AuthenticatedRequest, 
     return res.status(404).json({ error: 'Cliente não encontrado.' });
   }
 
+  if (client.status !== 'active') return res.status(409).json({ error: 'Cliente desativado.' });
+  if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(competenceMonth)) return res.status(400).json({ error: 'Competência inválida.' });
+
   const existingDeliveries = db.getDeliveries().filter(d => 
     d.clientId === clientId && 
     d.competenceMonth === competenceMonth
@@ -83,7 +86,7 @@ router.post('/generate', requireAuth, requireStaff, (req: AuthenticatedRequest, 
 
   // For each obligation, check how many already exist for that channel in this competence
   for (const obl of obligations) {
-    const existingCountForChannel = existingDeliveries.filter(d => d.channel === obl.channel).length;
+    const existingCountForChannel = existingDeliveries.filter(d => d.channel === obl.channel && d.format === obl.format).length;
     const remainingToCreate = Math.max(0, obl.monthlyQuantity - existingCountForChannel);
 
     if (remainingToCreate === 0) {

@@ -1,3 +1,6 @@
+import { LibraryView } from './components/library/LibraryView';
+import { ClientsContext } from './contexts/ClientsContext';
+import { BrandLibrary } from './components/brand/BrandLibrary';
 import React, { useState, useEffect } from 'react';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { TopBar } from './components/common/TopBar';
@@ -12,15 +15,13 @@ import { ClientPortal } from './components/portal/ClientPortal';
 import { RequestsManager } from './components/requests/RequestsManager';
 import { MetricsDashboard } from './components/metrics/MetricsDashboard';
 import { AdminPanel } from './components/admin/AdminPanel';
-import { AcceptanceCriteriaRunner } from './components/testing/AcceptanceCriteriaRunner';
 import { NotificationsDrawer } from './components/notifications/NotificationsDrawer';
 import { StaffOverview } from './components/dashboard/StaffOverview';
-import { LibraryView } from './components/library/LibraryView';
 import { Delivery, Client, ProductionStatus } from './types';
 import { api } from './lib/api';
 
 function MainLayout() {
-  const { user, loading:authLoading, isStaff, isClient, isAdmin } = useAuth();
+  const { user, isStaff, isClient, isAdmin } = useAuth();
   const [activeTab, setActiveTab] = useState<ActiveTab>('overview');
   const [deliveries, setDeliveries] = useState<Delivery[]>([]);
   const [clients, setClients] = useState<Client[]>([]);
@@ -52,7 +53,13 @@ function MainLayout() {
   };
 
   useEffect(() => {
-    fetchCoreData();
+    setSelectedDelivery(null);
+    setDeliveries([]);
+    setClients([]);
+    setLoading(true);
+    setError(null);
+    setActiveTab('overview');
+    if (user) fetchCoreData();
   }, [user?.id]);
 
   // Handle client portal tab defaults
@@ -82,7 +89,8 @@ function MainLayout() {
       case 'metrics': return 'Indicadores Operacionais';
       case 'admin': return 'Administração';
       case 'approvals': return 'Aprovações Pendentes';
-      case 'brand-kit': return 'Arquivos & Marca';
+      case 'brand-kit': return 'Identidade & referências';
+      case 'archive': return 'Acervo & Contexto';
       case 'testing': return 'Suíte de Homologação AC01-AC16';
     }
   };
@@ -90,11 +98,8 @@ function MainLayout() {
   const pendingApprovalsCount = deliveries.filter(d => d.approvalStatus === 'aguardando_aprovacao').length;
   const currentClient = clients.find(c => c.id === user?.clientId) || null;
 
-  if(authLoading) return <div className="p-10 text-neutral-600">Carregando Commet Desk…</div>;
-  if(!user) return <div className="max-w-xl mx-auto p-10"><h1 className="text-2xl font-bold">Commet Desk</h1><p className="mt-4">Acesso em preparação. O login de equipe e clientes será configurado quando os dados de acesso forem confirmados.</p><p className="mt-3 text-sm text-neutral-600">A demonstração é local e precisa ser habilitada explicitamente pelo administrador.</p></div>;
-
   return (
-    <div className="flex flex-col h-screen w-screen overflow-hidden bg-neutral-100 font-sans">
+    <ClientsContext.Provider value={clients}><div className="flex flex-col h-screen w-screen overflow-hidden bg-neutral-100 font-sans">
       {/* TopBar with single line brand, role status and profile switcher */}
       <TopBar
         currentViewTitle={getTabTitle(activeTab)}
@@ -105,7 +110,6 @@ function MainLayout() {
       <div className="flex-1 flex overflow-hidden">
         {/* Sidebar */}
         <Sidebar
-          clientName={currentClient?.name}
           activeTab={activeTab}
           onSelectTab={setActiveTab}
           pendingApprovalsCount={pendingApprovalsCount}
@@ -114,7 +118,7 @@ function MainLayout() {
 
         {/* Main Content Area */}
         <main className="flex-1 flex flex-col min-w-0 overflow-hidden bg-white">
-          {loading ? (
+          {error ? <div role="alert" className="p-6 text-red-700">{error}<button className="ml-4 underline" onClick={() => {setError(null); fetchCoreData();}}>Tentar novamente</button></div> : loading ? (
             <div className="flex-1 flex items-center justify-center text-xs text-neutral-500 font-medium">
               Carregando dados da operação Commet...
             </div>
@@ -148,9 +152,8 @@ function MainLayout() {
                 />
               )}
 
-              {activeTab === 'brand-kit' && (
-                <LibraryView />
-              )}
+              {activeTab === 'brand-kit' && <BrandLibrary key={user?.id} clients={clients} />}
+              {activeTab === 'archive' && <LibraryView key={user?.id} />}
 
               {activeTab === 'my-tasks' && (
                 <MyTasksView
@@ -202,7 +205,7 @@ function MainLayout() {
               )}
 
               {activeTab === 'testing' && (
-                <AcceptanceCriteriaRunner />
+                <p className="p-6">Os testes de regressão são executados fora da base operacional com npm test.</p>
               )}
             </>
           )}
@@ -232,14 +235,20 @@ function MainLayout() {
         onClose={() => setNotificationsOpen(false)}
         onRefreshUnread={() => fetchCoreData()}
       />
-    </div>
+    </div></ClientsContext.Provider>
   );
 }
 
+function AuthenticatedLayout() {
+  const { user, loading } = useAuth();
+  if (loading) return <p className="p-8">Carregando sessão…</p>;
+  if (!user) return <p role="alert" className="p-8">Acesso em preparação. O administrador precisa habilitar a demonstração local; login real e convites ficam para a etapa de acessos.</p>;
+  return <MainLayout key={user.id}/>;
+}
 export default function App() {
   return (
     <AuthProvider>
-      <MainLayout />
+      <AuthenticatedLayout />
     </AuthProvider>
   );
 }

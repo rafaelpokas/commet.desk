@@ -9,6 +9,16 @@ import type { LibraryAsset } from '../server/acervo/types.js';
 const temp=fs.mkdtempSync(path.join(os.tmpdir(),'commet-acervo-'));
 process.env.COMMET_TEST_MODE='1';process.env.COMMET_DEMO_MODE='1';process.env.NODE_ENV='test';
 process.env.COMMET_CATALOG_FILE=path.join(temp,'catalog.json');process.env.COMMET_ASSET_DIR=path.join(temp,'files');
+process.env.DATA_DIR=temp;
+const users=[
+  {id:'usr_admin',role:'admin'},
+  {id:'usr_ana',role:'employee'},
+  {id:'usr_mariana_client',role:'client_approver',clientId:'cli_solartech'}
+].map(u=>({...u,name:u.id,email:u.id+'@example.invalid',status:'active',createdAt:new Date().toISOString()}));
+fs.writeFileSync(path.join(temp,'commet-db.json'),JSON.stringify({users,
+  clients:[{id:'cli_solartech',name:'Cliente A',status:'active'},{id:'cli_nexalog',name:'Cliente B',status:'active'}],
+  brandAssets:[],channelAssignees:[],campaigns:[],monthlyObligations:[],monthlyPlanLogs:[],deliveries:[],tasks:[],clientRequests:[],comments:[],notifications:[],auditLogs:[]}));
+
 delete process.env.GITHUB_TOKEN;delete process.env.GOOGLE_APPLICATION_CREDENTIALS;delete process.env.GOOGLE_REFRESH_TOKEN;
 const content=Buffer.from('Original preservado');const localPath=path.join(temp,'original.txt');fs.writeFileSync(localPath,content);
 function asset(id:string,clientId:string,visibility:LibraryAsset['visibility'],state:LibraryAsset['state']='aprovado'):LibraryAsset {

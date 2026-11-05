@@ -1,3 +1,7 @@
+import { BrandLibrary } from '../brand/BrandLibrary';
+import { useContext } from 'react';
+import { ClientsContext } from '../../contexts/ClientsContext';
+import { ClientName, useClientName } from '../../contexts/ClientsContext';
 import React, { useState, useEffect } from 'react';
 import { 
   Delivery, 
@@ -46,8 +50,11 @@ export const DeliveryDetailModal: React.FC<DeliveryDetailModalProps> = ({
   onClose,
   onRefresh
 }) => {
-  const { user, isStaff, isClient, canApprove } = useAuth();
+  const { user, isStaff, isClient, canApprove: roleCanApprove } = useAuth();
+  const clients = useContext(ClientsContext);
+  const [showBrand, setShowBrand] = useState(false);
   const [delivery, setDelivery] = useState<Delivery>(initialDelivery);
+  const canApprove = roleCanApprove && delivery.approvalStatus === 'aguardando_aprovacao' && (!delivery.designatedApproverId || delivery.designatedApproverId === user?.id);
   const [activeTab, setActiveTab] = useState<'content' | 'approval' | 'tasks' | 'comments' | 'publish' | 'audit'>('content');
   const [selectedVersionNum, setSelectedVersionNum] = useState<number>(initialDelivery.currentVersionNumber);
 
@@ -186,6 +193,7 @@ export const DeliveryDetailModal: React.FC<DeliveryDetailModalProps> = ({
 
     try {
       const res = await api.updateDelivery(delivery.id, {
+        expectedUpdatedAt: delivery.updatedAt,
         title: editTitle,
         copywriting: editCopywriting,
         changeSummary: editChangeSummary || 'Alteração manual de conteúdo pela equipe'
@@ -334,7 +342,7 @@ export const DeliveryDetailModal: React.FC<DeliveryDetailModalProps> = ({
             <div className="flex items-center gap-2 mb-1.5 flex-wrap">
               <ChannelIcon channel={delivery.channel} className="w-4 h-4" />
               <span className="text-xs font-semibold text-neutral-700">
-                {delivery.clientId === 'cli_solartech' ? 'SolarTech Brasil' : 'Nexa Logística'}
+                <ClientName id={delivery.clientId}/>
               </span>
               <span className="text-neutral-300">·</span>
               <span className="text-xs font-mono text-neutral-500">{delivery.competenceMonth}</span>
@@ -487,6 +495,7 @@ export const DeliveryDetailModal: React.FC<DeliveryDetailModalProps> = ({
         {/* Modal Body */}
         <div className="flex-1 overflow-y-auto p-6 space-y-6">
           {/* TAB: CONTENT & PREVIEW */}
+          {isStaff && <div className="mb-4"><button className="text-sm px-4 py-2 rounded-lg border border-violet-200 text-violet-700" onClick={() => setShowBrand(!showBrand)}>{showBrand ? 'Fechar identidade' : 'Consultar identidade / salvar referência desta demanda'}</button>{showBrand && <BrandLibrary compact clients={clients} initialClientId={delivery.clientId} sourceDeliveryId={delivery.id}/>}</div>}
           {activeTab === 'content' && (
             <div className="space-y-6">
               {/* Version selector bar */}

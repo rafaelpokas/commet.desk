@@ -230,3 +230,31 @@ export interface AuditLog {
   isPublicForClient: boolean;
   createdAt: string;
 }
+
+export interface BrandAssetVersion {
+  id: string;
+  version: number;
+  fileName: string;
+  mimeType: string;
+  size: number;
+  sha256: string;
+  storageKey: string;
+  createdAt: string;
+  createdBy: string;
+}
+export interface BrandAsset {
+  id: string;
+  clientId: string;
+  title: string;
+  category: 'logo' | 'brandbook' | 'reference' | 'photo' | 'font' | 'other';
+  notes: string;
+  isReference: boolean;
+  visibility: 'internal' | 'shared';
+  revision: number;
+  archived: boolean;
+  versions: BrandAssetVersion[];
+  sourceDeliveryId?: string;
+  sourceVersion?: number;
+  createdAt: string;
+  updatedAt: string;
+}

@@ -71,17 +71,7 @@ export const TopBar: React.FC<TopBarProps> = ({
 
       {/* Zone 3: Actions & Profile Switcher */}
       <div className="flex items-center gap-3 shrink-0">
-        {/* Reset Database Button */}
-        <button
-          onClick={handleResetDb}
-          disabled={isResetting}
-          title="Restaurar dados padrão para testes"
-          className="p-1.5 text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100 rounded transition-colors text-xs flex items-center gap-1"
-        >
-          <RefreshCw className={`w-3.5 h-3.5 ${isResetting ? 'animate-spin' : ''}`} />
-          <span className="hidden lg:inline text-xs">Reset Demo</span>
-        </button>
-
+        <span className="text-xs text-amber-700 hidden lg:inline">Piloto local · dados propostos</span>
         {/* Notifications Button */}
         <button
           onClick={onOpenNotifications}

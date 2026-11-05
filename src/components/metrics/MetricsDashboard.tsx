@@ -1,3 +1,4 @@
+import { currentCompetence } from '../../lib/dates';
 import React, { useState, useEffect } from 'react';
 import { OperationalMetrics } from '../../types';
 import { api } from '../../lib/api';
@@ -16,7 +17,7 @@ import {
 export const MetricsDashboard: React.FC = () => {
   const { isStaff, user } = useAuth();
   const [metrics, setMetrics] = useState<OperationalMetrics | null>(null);
-  const [competence, setCompetence] = useState('2026-10');
+  const [competence, setCompetence] = useState(currentCompetence());
   const [loading, setLoading] = useState(false);
 
   const fetchMetrics = async () => {
@@ -50,14 +51,7 @@ export const MetricsDashboard: React.FC = () => {
 
         <div className="flex items-center gap-2 text-xs">
           <span className="text-neutral-500 font-medium">Competência:</span>
-          <select
-            value={competence}
-            onChange={(e) => setCompetence(e.target.value)}
-            className="p-1.5 border border-neutral-300 rounded-lg bg-white font-mono"
-          >
-            <option value="2026-10">Outubro 2026</option>
-            <option value="2026-09">Setembro 2026</option>
-          </select>
+          <input type="month" aria-label="Competência" value={competence} onChange={e=>setCompetence(e.target.value)} className="p-1.5 border rounded-lg"/>
         </div>
       </div>
 

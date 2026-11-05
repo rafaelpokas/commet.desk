@@ -1,3 +1,5 @@
+import { currentCompetence } from '../../lib/dates';
+import { ClientName, useClientName } from '../../contexts/ClientsContext';
 import React, { useState, useEffect } from 'react';
 import { User, Client, ClientChannelAssignee, MonthlyObligation } from '../../types';
 import { api } from '../../lib/api';
@@ -36,13 +38,13 @@ export const AdminPanel: React.FC = () => {
   const [newUserClientId, setNewUserClientId] = useState('');
 
   // Channel Assignee Form
-  const [selectedClientForAssignee, setSelectedClientForAssignee] = useState('cli_solartech');
+  const [selectedClientForAssignee, setSelectedClientForAssignee] = useState('');
   const [selectedChannelForAssignee, setSelectedChannelForAssignee] = useState('instagram');
-  const [selectedUserForAssignee, setSelectedUserForAssignee] = useState('usr_ana');
+  const [selectedUserForAssignee, setSelectedUserForAssignee] = useState('');
 
   // Plan Generation Form (AC13)
-  const [generateClientId, setGenerateClientId] = useState('cli_solartech');
-  const [generateCompetence, setGenerateCompetence] = useState('2026-10');
+  const [generateClientId, setGenerateClientId] = useState('');
+  const [generateCompetence, setGenerateCompetence] = useState(currentCompetence());
 
   const fetchData = async () => {
     setLoading(true);
@@ -55,6 +57,9 @@ export const AdminPanel: React.FC = () => {
       ]);
       setUsers(uRes.users);
       setClients(cRes.clients);
+      setSelectedClientForAssignee(previous => previous || cRes.clients[0]?.id || '');
+      setGenerateClientId(previous => previous || cRes.clients[0]?.id || '');
+      setSelectedUserForAssignee(previous => previous || uRes.users.find(u => u.role === 'admin' || u.role === 'employee')?.id || '');
       setChannelAssignees(caRes.assignees);
       setObligations(oRes.obligations);
     } catch (err: any) {
@@ -345,7 +350,7 @@ export const AdminPanel: React.FC = () => {
                         </span>
                       </td>
                       <td className="p-3 text-neutral-600">
-                        {u.clientId ? (u.clientId === 'cli_solartech' ? 'SolarTech Brasil' : 'Nexa Logística') : 'Equipe Interna Commet'}
+                        {u.clientId ? <ClientName id={u.clientId}/> : 'Equipe Interna Commet'}
                       </td>
                       <td className="p-3">
                         {u.status === 'active' ? (

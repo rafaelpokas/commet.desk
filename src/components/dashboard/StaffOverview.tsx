@@ -54,11 +54,11 @@ export const StaffOverview: React.FC<StaffOverviewProps> = ({
 
         <div className="flex items-center gap-2">
           <button
-            onClick={() => onNavigateTab('testing')}
+            onClick={() => onNavigateTab('brand-kit')}
             className="px-3 py-2 bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 text-emerald-800 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors"
           >
             <ShieldCheck className="w-4 h-4 text-emerald-600" />
-            <span>Homologação AC01-AC16</span>
+            <span>Identidade & referências</span>
           </button>
 
           <button
@@ -105,7 +105,7 @@ export const StaffOverview: React.FC<StaffOverviewProps> = ({
           onClick={() => onNavigateTab('kanban')}
           className="bg-white border border-neutral-200 rounded-xl p-4 cursor-pointer hover:border-neutral-300 transition-colors shadow-2xs"
         >
-          <div className="text-xs text-neutral-500 font-medium">Publicadas no Mês</div>
+          <div className="text-xs text-neutral-500 font-medium">Publicadas</div>
           <div className="text-2xl font-bold font-mono text-emerald-600 mt-1 tabular-nums">
             {publishedCount}
           </div>
