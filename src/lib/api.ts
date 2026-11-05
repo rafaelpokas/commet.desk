@@ -13,8 +13,8 @@ import {
 } from '../types';
 
 let currentAuthToken: string = typeof localStorage !== 'undefined' 
-  ? (localStorage.getItem('commet_auth_token') || 'usr_admin') 
-  : 'usr_admin';
+  ? (localStorage.getItem('commet_auth_token') || '')
+  : '';
 
 export function setAuthToken(token: string) {
   currentAuthToken = token;
@@ -55,6 +55,7 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
 }
 
 export const api = {
+  getAuthConfig: () => request<{demoEnabled:boolean;identityConfigured:boolean}>('/api/auth/config'),
   // Auth
   login: (email?: string, userId?: string) =>
     request<{ token: string; user: User }>('/api/auth/login', {

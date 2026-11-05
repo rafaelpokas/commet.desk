@@ -1,3 +1,4 @@
+import { LibraryView } from './components/library/LibraryView';
 import { ClientsContext } from './contexts/ClientsContext';
 import { BrandLibrary } from './components/brand/BrandLibrary';
 import React, { useState, useEffect } from 'react';
@@ -88,7 +89,8 @@ function MainLayout() {
       case 'metrics': return 'Indicadores Operacionais';
       case 'admin': return 'Administração';
       case 'approvals': return 'Aprovações Pendentes';
-      case 'brand-kit': return 'Arquivos & Marca';
+      case 'brand-kit': return 'Identidade & referências';
+      case 'archive': return 'Acervo & Contexto';
       case 'testing': return 'Suíte de Homologação AC01-AC16';
     }
   };
@@ -151,6 +153,7 @@ function MainLayout() {
               )}
 
               {activeTab === 'brand-kit' && <BrandLibrary key={user?.id} clients={clients} />}
+              {activeTab === 'archive' && <LibraryView key={user?.id} />}
 
               {activeTab === 'my-tasks' && (
                 <MyTasksView
@@ -239,7 +242,7 @@ function MainLayout() {
 function AuthenticatedLayout() {
   const { user, loading } = useAuth();
   if (loading) return <p className="p-8">Carregando sessão…</p>;
-  if (!user) return <p role="alert" className="p-8">Não foi possível carregar a sessão do piloto. Verifique se o servidor está disponível e recarregue.</p>;
+  if (!user) return <p role="alert" className="p-8">Acesso em preparação. O administrador precisa habilitar a demonstração local; login real e convites ficam para a etapa de acessos.</p>;
   return <MainLayout key={user.id}/>;
 }
 export default function App() {

@@ -27,9 +27,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const res = await api.getMe();
       setUser(res.user);
     } catch (err) {
-      console.warn('Sessão inicial não encontrada, alternando para admin padrão:', err);
-      // Fallback to default admin
       try {
+        const config=await api.getAuthConfig();
+        if(!config.demoEnabled) {setUser(null);return;}
         setAuthToken('usr_admin');
         const retry = await api.getMe();
         setUser(retry.user);

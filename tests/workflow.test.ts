@@ -8,6 +8,7 @@ import express from 'express';
 test('Piloto VSD: isolamento, arquivos e aprovação', async t => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'commet-test-'));
   process.env.DATA_DIR = dir;
+  process.env.COMMET_DEMO_MODE = '1';
   process.env.BRAND_STORAGE_DIR = path.join(dir,'assets');
   const { db } = await import('../server/db.js');
   const brand = (await import('../server/routes/brandAssets.js')).default;
@@ -107,4 +108,3 @@ test('Piloto VSD: isolamento, arquivos e aprovação', async t => {
     });
   } finally { await new Promise<void>(r=>server.close(()=>r())); fs.rmSync(dir,{recursive:true,force:true}); }
 });
-

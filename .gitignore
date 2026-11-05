@@ -12,3 +12,6 @@ data/*.tmp.json
 data/*.backup*
 data/commet-db.json
 data-*/
+data/acervo.json
+data/acervo-files/
+data/*.tmp

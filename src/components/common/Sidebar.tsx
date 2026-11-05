@@ -26,6 +26,7 @@ export type ActiveTab =
   | 'metrics'
   | 'admin'
   | 'approvals'
+  | 'archive'
   | 'brand-kit'
   | 'testing';
 
@@ -56,6 +57,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </div>
 
       <nav className="flex-1 p-3 space-y-1 overflow-y-auto text-sm">
+        <button onClick={()=>onSelectTab('archive')} className={`w-full flex items-center gap-3 px-3 py-2 rounded-md font-medium text-left ${activeTab==='archive'?'bg-neutral-900 text-white':'text-neutral-700 hover:bg-neutral-100'}`}><FolderOpen className="w-4 h-4"/><span>Acervo & Contexto</span></button>
         {/* CLIENT NAVIGATION */}
         {isClient && (
           <>

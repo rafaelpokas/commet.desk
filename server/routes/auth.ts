@@ -3,6 +3,12 @@ import { db } from '../db.js';
 import { requireAuth, AuthenticatedRequest } from '../auth.js';
 
 const router = Router();
+const demo=()=>process.env.NODE_ENV!=='production'&&process.env.COMMET_DEMO_MODE==='1';
+router.get('/config',(_req,res)=>res.json({demoEnabled:demo(),identityConfigured:false}));
+router.use((req,res,next)=>{
+  if(!demo()&&['/login','/demo-users','/reset-db'].includes(req.path)) return res.status(404).json({error:'Acesso real ainda não configurado'});
+  next();
+});
 
 // Login
 router.post('/login', (req: Request, res: Response) => {

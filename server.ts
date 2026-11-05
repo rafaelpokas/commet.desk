@@ -14,12 +14,14 @@ import requestsRouter from './server/routes/requests.js';
 import commentsRouter from './server/routes/comments.js';
 import notificationsRouter from './server/routes/notifications.js';
 import metricsRouter from './server/routes/metrics.js';
+import libraryRouter from './server/routes/library.js';
+import { syncCatalog } from './server/acervo/sync.js';
 import { requireAuth, AuthenticatedRequest } from './server/auth.js';
 import { db } from './server/db.js';
 
 dotenv.config();
 
-const app = express();
+export const app = express();
 const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
 const isProd = process.env.NODE_ENV === 'production';
 
@@ -47,6 +49,7 @@ app.use('/api/requests', requestsRouter);
 app.use('/api/comments', commentsRouter);
 app.use('/api/notifications', notificationsRouter);
 app.use('/api/metrics', metricsRouter);
+app.use('/api/library', libraryRouter);
 
 // Audit logs endpoint (AC01: filtered by client for client users)
 app.get('/api/audit-logs', requireAuth, (req: AuthenticatedRequest, res: Response) => {
@@ -72,7 +75,7 @@ app.get('/api/audit-logs', requireAuth, (req: AuthenticatedRequest, res: Respons
 });
 
 async function startServer() {
-  if (isProd) throw new Error('Autenticação ainda é de piloto. Configure autenticação real antes de expor em produção.');
+  if (isProd) throw new Error('Implantação pública pendente: configurar identidade real antes de disponibilizar o Desk. O modo de demonstração é apenas local.');
   if (!isProd) {
     const { createServer: createViteServer } = await import('vite');
     const vite = await createViteServer({
@@ -89,11 +92,15 @@ async function startServer() {
   }
 
   app.listen(PORT, '127.0.0.1', () => {
-    console.log(`Commet Ecosystem Server running on http://127.0.0.1:${PORT}`);
+    console.log(`Commet Desk local: http://127.0.0.1:${PORT}`);
   });
+  if(process.env.COMMET_AUTO_SYNC==='1') {
+    void syncCatalog();
+    setInterval(()=>void syncCatalog(),60000).unref();
+  }
 }
 
-startServer().catch(err => {
+if(process.env.COMMET_TEST_MODE!=='1') startServer().catch(err => {
   console.error('Failed to start server:', err);
   process.exit(1);
 });
