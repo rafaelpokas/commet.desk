@@ -29,6 +29,7 @@ export type ActiveTab =
   | 'testing';
 
 interface SidebarProps {
+  clientName?: string;
   activeTab: ActiveTab;
   onSelectTab: (tab: ActiveTab) => void;
   pendingApprovalsCount?: number;
@@ -36,6 +37,7 @@ interface SidebarProps {
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
+  clientName,
   activeTab,
   onSelectTab,
   pendingApprovalsCount = 0,
@@ -50,7 +52,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           {isClient ? 'Portal do Cliente' : 'Operação Interna'}
         </div>
         <div className="text-sm font-semibold text-neutral-900 truncate">
-          {isClient ? (user?.clientId === 'cli_solartech' ? 'SolarTech Brasil' : 'Nexa Logística') : 'Agência Commet'}
+          {isClient ? (clientName||'Portal do cliente') : 'Agência Commet'}
         </div>
       </div>
 
@@ -130,6 +132,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {/* STAFF NAVIGATION */}
         {isStaff && (
           <>
+            <button onClick={()=>onSelectTab('brand-kit')} className={`w-full flex items-center gap-3 px-3 py-2 rounded-md font-medium text-left ${activeTab==='brand-kit'?'bg-neutral-900 text-white':'text-neutral-700 hover:bg-neutral-100'}`}><FolderOpen className="w-4 h-4"/><span>Arquivos & Contexto</span></button>
             <button
               onClick={() => onSelectTab('overview')}
               className={`w-full flex items-center gap-3 px-3 py-2 rounded-md font-medium text-left transition-colors ${

@@ -6,3 +6,6 @@ coverage/
 *.log
 .env*
 !.env.example
+data/acervo.json
+data/acervo-files/
+data/*.tmp

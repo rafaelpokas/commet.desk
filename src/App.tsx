@@ -15,11 +15,12 @@ import { AdminPanel } from './components/admin/AdminPanel';
 import { AcceptanceCriteriaRunner } from './components/testing/AcceptanceCriteriaRunner';
 import { NotificationsDrawer } from './components/notifications/NotificationsDrawer';
 import { StaffOverview } from './components/dashboard/StaffOverview';
+import { LibraryView } from './components/library/LibraryView';
 import { Delivery, Client, ProductionStatus } from './types';
 import { api } from './lib/api';
 
 function MainLayout() {
-  const { user, isStaff, isClient, isAdmin } = useAuth();
+  const { user, loading:authLoading, isStaff, isClient, isAdmin } = useAuth();
   const [activeTab, setActiveTab] = useState<ActiveTab>('overview');
   const [deliveries, setDeliveries] = useState<Delivery[]>([]);
   const [clients, setClients] = useState<Client[]>([]);
@@ -89,6 +90,9 @@ function MainLayout() {
   const pendingApprovalsCount = deliveries.filter(d => d.approvalStatus === 'aguardando_aprovacao').length;
   const currentClient = clients.find(c => c.id === user?.clientId) || null;
 
+  if(authLoading) return <div className="p-10 text-neutral-600">Carregando Commet Desk…</div>;
+  if(!user) return <div className="max-w-xl mx-auto p-10"><h1 className="text-2xl font-bold">Commet Desk</h1><p className="mt-4">Acesso em preparação. O login de equipe e clientes será configurado quando os dados de acesso forem confirmados.</p><p className="mt-3 text-sm text-neutral-600">A demonstração é local e precisa ser habilitada explicitamente pelo administrador.</p></div>;
+
   return (
     <div className="flex flex-col h-screen w-screen overflow-hidden bg-neutral-100 font-sans">
       {/* TopBar with single line brand, role status and profile switcher */}
@@ -101,6 +105,7 @@ function MainLayout() {
       <div className="flex-1 flex overflow-hidden">
         {/* Sidebar */}
         <Sidebar
+          clientName={currentClient?.name}
           activeTab={activeTab}
           onSelectTab={setActiveTab}
           pendingApprovalsCount={pendingApprovalsCount}
@@ -144,12 +149,7 @@ function MainLayout() {
               )}
 
               {activeTab === 'brand-kit' && (
-                <ClientPortal
-                  deliveries={deliveries}
-                  client={currentClient}
-                  onOpenDetails={(d) => setSelectedDelivery(d)}
-                  onRequestDemand={() => setActiveTab('requests')}
-                />
+                <LibraryView />
               )}
 
               {activeTab === 'my-tasks' && (

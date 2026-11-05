@@ -7,6 +7,8 @@ export interface AuthenticatedRequest extends Request {
 }
 
 export function getUserFromRequest(req: Request): User | null {
+  const local=['127.0.0.1','::1','::ffff:127.0.0.1'].includes(req.socket.remoteAddress||'');
+  if(process.env.NODE_ENV==='production'||process.env.COMMET_DEMO_MODE!=='1'||!local) return null;
   const authHeader = req.headers.authorization;
   let userId = '';
 
